@@ -1,15 +1,17 @@
 PromptPay QR Payment Generator
 
-A simple web application that allows users to enter a payment amount and generate a PromptPay QR code for convenient payments in Thailand.
+A simple web application for generating PromptPay QR codes by entering a payment amount in Thai Baht (THB).
+
+The application uses a frontend interface to collect the payment amount and a Node.js backend to generate a PromptPay QR code that can be scanned using a supported mobile banking application.
 
 Features
 
-* Enter a payment amount in Thai Baht (THB).
-* Generate a PromptPay QR code through a backend API.
-* Display the QR code and payment amount.
+* Generate PromptPay QR codes based on a specified payment amount.
+* Validate payment amounts before generating QR codes.
+* Display the QR code and total payment amount.
 * Download the generated QR code as an image.
-* Validate payment amounts before generating a QR code.
-* Responsive and minimal user interface.
+* Provide error messages when QR code generation fails.
+* Minimal and responsive user interface.
 
 Tech Stack
 
@@ -24,79 +26,133 @@ Backend
 
 * Node.js
 * Express.js
-* PromptPay QR generation API or library
+* promptpay-qr
+* qrcode
+* CORS
 
 Project Structure
 
-project/
-├── index.html
-├── style.css
-└── images/
-    └── promptpay.png
+promptpay-qr-payment/
+├── frontend/
+│   ├── index.html
+│   └── style.css
+├── backend/
+│   ├── server.js
+│   └── package.json
+└── README.md
 
-The backend is expected to run separately and provide the /generateQR endpoint.
+The directory structure above is an example. Adjust the file locations to match your actual project.
 
 Getting Started
 
-1. Clone the Repository
+1. Prerequisites
 
-git clone <repository-url>
-cd <project-folder>
+Make sure you have installed:
 
-2. Start the Backend
+* Node.js
+* npm
+* A web browser
 
-Make sure your backend server is configured to generate PromptPay QR codes and runs at:
+2. Install Dependencies
+
+Navigate to your backend directory and install the required packages.
+
+npm init -y
+npm install express qrcode promptpay-qr cors
+
+3. Configure Your PromptPay Number
+
+Open your backend file and locate:
+
+const mobileNumber = 'YOUR_PROMPTPAY_NUMBER'
+
+Replace YOUR_PROMPTPAY_NUMBER with the PromptPay phone number registered to receive payments.
+
+Keep your actual payment details private when publishing your project.
+
+4. Start the Backend Server
+
+Run the following command in your backend directory:
+
+node server.js
+
+The server will start at:
 
 http://localhost:3000
 
-The frontend sends a POST request to:
+To check whether the server is running, open the address in your browser. It should return a JSON response.
+
+5. Run the Frontend
+
+Open index.html in your browser or use the Live Server extension in Visual Studio Code.
+
+The frontend sends a POST request to the backend endpoint:
+
+http://localhost:3000/generateQR
+
+Make sure the backend is running before generating a QR code.
+
+API Endpoint
+
+Generate PromptPay QR Code
+
+Endpoint
 
 POST /generateQR
 
-Example request body:
+Request Body
 
 {
   "amount": 100
 }
 
-Expected response format:
+Successful Response
 
 {
   "Rescode": 200,
+  "resMessage": "QR Code generated successfully",
   "result": "data:image/png;base64,..."
 }
 
-The result field should contain an image URL or a Base64-encoded image data URL that the browser can display.
+The result field contains the generated QR code as a Base64-encoded image data URL.
 
-3. Run the Frontend
+Error Response
 
-Open index.html in your browser or use a local development server, such as the Live Server extension in Visual Studio Code.
+{
+  "Rescode": 400,
+  "resMessage": "Invalid amount"
+}
 
-Ensure the backend is running before generating a QR code.
+The API returns an error when the payment amount is invalid or when QR code generation fails.
 
 How to Use
 
 1. Open the application in your browser.
-2. Enter the payment amount in THB.
+2. Enter the desired payment amount in THB.
 3. Click Generate QR Code.
-4. Scan the displayed QR code using a supported mobile banking application.
-5. Click Download QR Code to save the image.
+4. Wait for the QR code to appear.
+5. Scan the QR code using a supported mobile banking application.
+6. Click Download QR Code to save the image.
 
-Validation
+Payment Amount Validation
 
-The application validates the entered amount before sending the request to the backend.
+The frontend validates the payment amount before sending the request.
 
 * The amount must be greater than zero.
 * The maximum amount is 999,999,999.99 THB.
-* The amount can contain up to two decimal places.
+* The amount must contain no more than two decimal places.
+
+The backend also checks that the amount is valid before generating the QR code.
 
 Notes
 
-* The backend must implement the /generateQR endpoint.
-* The QR code must contain valid PromptPay payment data to support banking-app scanning.
-* Generating a QR code does not confirm that a payment has been completed.
-* For production deployment, configure the API endpoint appropriately and implement suitable security measures.
+* The QR code is generated using the PromptPay number configured in the backend.
+* The displayed payment amount is the amount entered by the user.
+* Generating a QR code does not mean that a payment has been completed.
+* This project generates payment QR codes; it does not process or verify transactions.
+* The backend currently uses a local development URL. Update the API URL when deploying the application.
+* For production use, configure appropriate security measures, input validation, and error handling.
 
 License
 
-This project is intended for educational and development purposes.
+This project is intended for learning and development purposes.
